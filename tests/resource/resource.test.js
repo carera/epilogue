@@ -194,6 +194,26 @@ describe('Resource(basic)', function() {
       });
     });
 
+    it('should overload create.write milestone with custom one', function(done) {
+      test.userResource.create.write({override: true}, function (req, res, context) {
+        test.models.User.create({
+          username: req.body.username,
+          email: req.body.email
+        }).then(function(result) {
+          context.instance = result;
+          res.status(201);
+          return context.skip();
+        });
+      });
+      request.post({
+        url: test.baseUrl + '/users',
+        json: { username: 'arthur', email: 'arthur@gmail.com' }
+      }, function(error, response, body) {
+        expect(response.statusCode).to.equal(201);
+        done();
+      });
+    });
+
     [
       {
         description: 'should catch validation errors',
